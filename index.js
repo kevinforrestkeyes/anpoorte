@@ -1,3 +1,5 @@
+import { addNewProduct, getAllProducts } from './lib/shopify';
+
 const dotenv = require('dotenv').config();
 const express = require('express');
 const crypto = require('crypto');
@@ -96,25 +98,8 @@ app.get('/auth/callback', (req, res) => {
 });
 
 app.get('/get-products', (req, res) => {
-	const shopify = new Shopify({
-		shopName,
-		accessToken,
-	});
-
-	shopify
-		.product
-		.create({
-			"title": "crappy pet store nuggets",
-			"body_html": "<strong>CRAPS!</strong>",
-			"vendor": "jimym",
-			"product_type": "Snowboard",
-			"tags": "Barnes & Noble, John's Fav, \"Big Air\""
-		})
-		.then(
-			(product) => res.send(product), 
-			(err) => console.log(err)
-		);
-	
+	getAllProducts(shopName, accessToken)
+		.then((products) => res.send(products));
 })
 
 const PORT = process.env.PORT || 4444;
