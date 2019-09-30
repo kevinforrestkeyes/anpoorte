@@ -8,5 +8,14 @@
   },
   "keywords": [],
   "author": "kevinforrestkeyes",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.1.0",
+    "esm": "^3.2.25",
+    "express": "^4.17.1",
+    "shopify-api-node": "^2.23.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.3"
+  }
 }
