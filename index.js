@@ -2,6 +2,7 @@ import { addNewProduct, getAllProducts } from './lib/shopify';
 
 const dotenv = require('dotenv').config();
 const express = require('express');
+const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const cookie = require('cookie');
 const nonce = require('nonce')();
@@ -13,9 +14,13 @@ const Shopify = require('shopify-api-node');
 const apiKey = process.env.SHOPIFY_API_KEY;
 const apiSecret = process.env.SHOPIFY_API_SECRET;
 const scopes = 'read_products,write_products';
-const forwardingAddress = "https://anpoorte.herokuapp.com";
+// const forwardingAddress = "https://anpoorte.herokuapp.com";
+const forwardingAddress = "https://f420deb1.ngrok.io";
 let accessToken;
 let shopName;
+
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
   res.send({ respone: 'anpoort birb' });
@@ -24,6 +29,12 @@ app.get('/', (req, res) => {
 app.get('/get-auth-status', (req, res) => {
 	const authStatus = accessToken !== undefined;
 	res.send({ authorized: authStatus });
+})
+
+app.post('/add-new-product', async (req, res) => {
+	await addNewProduct(shopName, accessToken, req.body);
+	console.log('waited');
+	return ({ result: 'success' })
 })
 
 app.get('/shopify', (req, res) => {
