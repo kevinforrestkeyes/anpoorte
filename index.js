@@ -31,10 +31,9 @@ app.get('/get-auth-status', (req, res) => {
 	res.send({ authorized: authStatus });
 })
 
-app.post('/add-new-product', async (req, res) => {
-	await addNewProduct(shopName, accessToken, req.body);
-	console.log('waited');
-	return ({ result: 'success' })
+app.post('/add-new-product', (req, res) => {
+	addNewProduct(shopName, accessToken, req.body)
+		.then((result) => res.send(result))
 })
 
 app.get('/shopify', (req, res) => {
