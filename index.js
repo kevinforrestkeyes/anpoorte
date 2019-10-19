@@ -13,8 +13,8 @@ const Shopify = require('shopify-api-node');
 
 const apiKey = process.env.SHOPIFY_API_KEY;
 const apiSecret = process.env.SHOPIFY_API_SECRET;
+const forwardingAddress = process.env.FORWARDING_ADDRESS;
 const scopes = 'read_products,write_products';
-const forwardingAddress = "https://anpoorte.herokuapp.com";
 let accessToken;
 let shopName;
 
