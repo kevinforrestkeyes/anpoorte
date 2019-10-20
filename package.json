@@ -16,6 +16,7 @@
     "dotenv": "^8.1.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",
+    "mongoose": "^5.7.5",
     "nonce": "^1.0.4",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",

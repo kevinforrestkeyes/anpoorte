@@ -1,4 +1,5 @@
 import { addNewProduct, getAllProducts } from './lib/shopify';
+import { createTokenEntry, addTokenToTokenEntry } from './lib/db_controller';
 
 const dotenv = require('dotenv').config();
 const express = require('express');
@@ -18,7 +19,7 @@ const scopes = 'read_products,write_products';
 let accessToken;
 let shopName;
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
@@ -53,9 +54,10 @@ app.get('/shopify', (req, res) => {
   }
 });
 
-app.get('/auth/callback', (req, res) => {
+app.get('/auth/callback', async (req, res) => {
 	const { shop, hmac, code, state } = req.query;
 	shopName = shop;
+	createTokenEntry(shop);
   const stateCookie = cookie.parse(req.headers.cookie).state;
 
   if (state !== stateCookie) {
@@ -94,9 +96,10 @@ app.get('/auth/callback', (req, res) => {
 		};
 
 		request.post(accessTokenRequestUrl, { json: accessTokenPayload })
-		.then((accessTokenResponse) => {
+		.then(async (accessTokenResponse) => {
 			accessToken = accessTokenResponse.access_token;
-			res.redirect('http://localhost:8081/')
+			const { clientToken } = await addTokenToTokenEntry(shopName, accessToken);
+			res.redirect(`http://localhost:8081/shopify?shopifyClientToken=${clientToken}`);
 		})
 		.catch((error) => {
 			res.status(error.statusCode).send(error.error.error_description);
