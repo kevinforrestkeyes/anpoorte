@@ -1,5 +1,5 @@
 import { addNewProduct, getAllProducts } from './lib/shopify';
-import { createTokenEntry, addTokenToTokenEntry } from './lib/db_controller';
+import { createTokenEntry, addTokenToTokenEntry, findTokenEntryByClientToken } from './lib/db_controller';
 
 const dotenv = require('dotenv').config();
 const express = require('express');
@@ -16,8 +16,6 @@ const apiKey = process.env.SHOPIFY_API_KEY;
 const apiSecret = process.env.SHOPIFY_API_SECRET;
 const forwardingAddress = process.env.FORWARDING_ADDRESS;
 const scopes = 'read_products,write_products';
-let accessToken;
-let shopName;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -26,14 +24,20 @@ app.get('/', (req, res) => {
   res.send({ respone: 'anpoort birb' });
 });
 
-app.get('/get-auth-status', (req, res) => {
-	const authStatus = accessToken !== undefined;
-	res.send({ authorized: authStatus });
-})
-
-app.post('/add-new-product', (req, res) => {
-	addNewProduct(shopName, accessToken, req.body)
-		.then((result) => res.send(result))
+app.post('/add-new-product', async (req, res) => {
+	const clientToken = req.query.clientToken;
+	const tokenEntry = await findTokenEntryByClientToken(clientToken);
+	if (tokenEntry) {
+		const accessToken = tokenEntry.storeToken;
+		const shopName = tokenEntry.storeName;
+		addNewProduct(shopName, accessToken, req.body)
+			.then((result) => res.send(result))
+	} else {
+		res.send({ 
+			status: 'failure',
+			message: 'no matching token found'
+		});
+	}
 })
 
 app.get('/shopify', (req, res) => {
@@ -56,7 +60,6 @@ app.get('/shopify', (req, res) => {
 
 app.get('/auth/callback', async (req, res) => {
 	const { shop, hmac, code, state } = req.query;
-	shopName = shop;
 	createTokenEntry(shop);
   const stateCookie = cookie.parse(req.headers.cookie).state;
 
@@ -97,8 +100,8 @@ app.get('/auth/callback', async (req, res) => {
 
 		request.post(accessTokenRequestUrl, { json: accessTokenPayload })
 		.then(async (accessTokenResponse) => {
-			accessToken = accessTokenResponse.access_token;
-			const { clientToken } = await addTokenToTokenEntry(shopName, accessToken);
+			const accessToken = accessTokenResponse.access_token;
+			const { clientToken } = await addTokenToTokenEntry(shop, accessToken);
 			res.redirect(`http://localhost:8081/shopify?shopifyClientToken=${clientToken}`);
 		})
 		.catch((error) => {
@@ -109,9 +112,23 @@ app.get('/auth/callback', async (req, res) => {
   }
 });
 
-app.get('/get-products', (req, res) => {
-	getAllProducts(shopName, accessToken)
-		.then((products) => res.send(products));
+app.get('/get-products', async (req, res) => {
+	const clientToken = req.query.clientToken;
+	const tokenEntry = await findTokenEntryByClientToken(clientToken);
+	if (tokenEntry) {
+		const accessToken = tokenEntry.storeToken;
+		const shopName = tokenEntry.storeName;
+		getAllProducts(shopName, accessToken)
+			.then((products) => res.send({
+				status: 'success',
+				products
+			}));
+	} else {
+		res.send({ 
+			status: 'failure',
+			message: 'no matching token found'
+		});
+	}
 })
 
 const PORT = process.env.PORT || 4444;
