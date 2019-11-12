@@ -102,7 +102,7 @@ app.get('/auth/callback', async (req, res) => {
 		.then(async (accessTokenResponse) => {
 			const accessToken = accessTokenResponse.access_token;
 			const { clientToken } = await addTokenToTokenEntry(shop, accessToken);
-			res.redirect(`http://localhost:8081/shopify?shopifyClientToken=${clientToken}`);
+			res.redirect(`https://wjisk.netlify.com/shopify?shopifyClientToken=${clientToken}`);
 		})
 		.catch((error) => {
 			res.status(error.statusCode).send(error.error.error_description);
