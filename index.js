@@ -20,6 +20,14 @@ const scopes = 'read_products,write_products';
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.use(function (req, res, next) {
+	res.setHeader('Access-Control-Allow-Origin', 'https://wjisk.netlify.com');
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+	res.setHeader('Access-Control-Allow-Credentials', true);
+	next();
+})
+
 app.get('/', (req, res) => {
   res.send({ respone: 'anpoort birb' });
 });
