@@ -4,7 +4,7 @@ anpoorte is a supporting piece of a larger application [wjisk](https://github.co
 
 ## this repository
 
-anpoorte is a node/express server which interacts with the Shopify API and also has an its own API for handling requests from the front-end of the application. it uses a mongo database to store product data from Shopify, which it serves via the API to the client. it also accepts payloads of product data from the client to upload to Shopify. essentially working as a pass-between from wjisk to the desired Shopify store, while also leveraging a database for caching some of the product data for the user.
+anpoorte is a Node/Express server which interacts with the Shopify API and also has an its own API for handling requests from the front-end of the application. it uses a mongo database to store product data from Shopify, which it serves via the API to the client. it also accepts payloads of product data from the client to upload to Shopify. essentially working as a pass-between from wjisk to the desired Shopify store, while also leveraging a database for caching some of the product data for the user.
 
 ## supporting applications
 
